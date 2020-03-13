@@ -84,7 +84,7 @@ def main():
 
 
     if(Run):
-        if os.path.exists("./JPsiGen.exe")
+        if os.path.exists("./JPsiGen.exe"):
             Cmd = "./JPsiGen.exe"
         else:
             # let it find it in $PATH:
