@@ -85,10 +85,10 @@ def main():
 
     if(Run):
         if os.path.exists("./JPsiGen.exe")
-          Cmd = "./JPsiGen.exe"
+            Cmd = "./JPsiGen.exe"
         else:
-          # let it find it in $PATH:
-          Cmd = "JpsiGen.exe"
+            # let it find it in $PATH:
+            Cmd = "JpsiGen.exe"
         print("Running the generator from the python code \n")
         os.system(Cmd);
 
