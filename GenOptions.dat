@@ -1,9 +1,9 @@
 Nsim     100000
-NPerFile 35000
+NPerFile 10000
 Eb       10.6
-tLim     -6
-lTarg    5
+tLim     -6.0
+lTarg    5.0
 EgMin    4
 EgMax    10.6
 Q2Cut    0.02
-LUND     1
+LUND     0
