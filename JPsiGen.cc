@@ -118,7 +118,8 @@ int main() {
     if (!isLund) {
         file_out = new TFile("JPsi_gen.root", "Recreate");
     } else {
-        Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+        //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+        Lund_out.open( "JPsiGen.dat", ofstream::out);
     }
 
     TH2D *h_ph_h_ph_cm1 = new TH2D("h_ph_h_ph_cm1", "", 200, 0., 360., 200, 0., 360.);
@@ -162,14 +163,14 @@ int main() {
             cout.flush() << "Processed " << i << " events, approximetely " << double(100. * i / double(Nsim)) << "%\r";
         }
 
-        if ((i + 1) % n_perfile == 0) {
-            if (isLund) {
-                Lund_out.close();
-                file_number++;
-                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-            }
-        }
+//        if ((i + 1) % n_perfile == 0) {
+//            if (isLund) {
+//                Lund_out.close();
+//                file_number++;
+//                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+//                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+//            }
+//        }
 
         Q2 = MJPsi*MJPsi;
 
