@@ -119,7 +119,7 @@ int main() {
         file_out = new TFile("JPsi_gen.root", "Recreate");
     } else {
         //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        Lund_out.open( "JPsiGen.dat", ofstream::out);
+        Lund_out.open( "jpsigen.dat", ofstream::out);
     }
 
     TH2D *h_ph_h_ph_cm1 = new TH2D("h_ph_h_ph_cm1", "", 200, 0., 360., 200, 0., 360.);
