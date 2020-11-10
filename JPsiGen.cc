@@ -49,6 +49,7 @@ int main() {
     double q2_cut;
     double l_targ;
     int n_perfile;
+    int seed;
 
     for (map<std::string, std::string>::iterator it = m_Settings.begin(); it != m_Settings.end(); it++) {
 
@@ -59,7 +60,7 @@ int main() {
             Nsim = atoi(val.c_str());
         } else if (key.compare("NPerFile") == 0) {
             n_perfile = atoi(val.c_str());
-        }else if (key.compare("Eb") == 0) {
+        } else if (key.compare("Eb") == 0) {
             Eb = atof(val.c_str());
         } else if (key.compare("tLim") == 0) {
             t_lim = atof(val.c_str());
@@ -73,7 +74,10 @@ int main() {
             l_targ = atof(val.c_str());
         } else if (key.compare("LUND") == 0) {
             isLund = atof(val.c_str());
+        } else if (key.compare("Seed") == 0) {
+            seed = atoi(val.c_str());
         }
+
 
     }
 
@@ -102,7 +106,7 @@ int main() {
     bool write_root = !isLund;
 
     TRandom2 rand;
-    rand.SetSeed(0);
+    rand.SetSeed(seed);
 
     TF1 *f_JPsi_dsigm_dt = new TF1("f_JPsi_dsigm_dt", JPsi_dsigm_dt, 8.25, 25., 2);
     f_JPsi_dsigm_dt->SetParameter(1, SLAC_Fit_scale);
@@ -119,7 +123,7 @@ int main() {
         file_out = new TFile("JPsi_gen.root", "Recreate");
     } else {
         //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        Lund_out.open( "JPsiGen.dat", ofstream::out);
+        Lund_out.open("JPsiGen.dat", ofstream::out);
     }
 
     TH2D *h_ph_h_ph_cm1 = new TH2D("h_ph_h_ph_cm1", "", 200, 0., 360., 200, 0., 360.);
@@ -163,14 +167,14 @@ int main() {
             cout.flush() << "Processed " << i << " events, approximetely " << double(100. * i / double(Nsim)) << "%\r";
         }
 
-//        if ((i + 1) % n_perfile == 0) {
-//            if (isLund) {
-//                Lund_out.close();
-//                file_number++;
-//                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-//                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-//            }
-//        }
+        //        if ((i + 1) % n_perfile == 0) {
+        //            if (isLund) {
+        //                Lund_out.close();
+        //                file_number++;
+        //                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+        //                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
+        //            }
+        //        }
 
         Q2 = MJPsi*MJPsi;
 
