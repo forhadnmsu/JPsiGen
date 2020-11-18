@@ -88,6 +88,9 @@ int main() {
     cout << "Eg_max = " << Eg_max << endl;
     cout << "q2_cut = " << q2_cut << endl;
     cout << "IsLund = " << isLund << endl;
+    cout<<"**************************************************"<<endl;
+    cout<<"*******"<<" RandomSeedActuallyUsed: "<<seed<<" *******"<<endl;
+    cout<<"**************************************************"<<endl;
 
 
     const double PI = 3.14159265358979312;
