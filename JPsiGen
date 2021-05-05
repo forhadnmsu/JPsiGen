@@ -22,13 +22,14 @@ def main():
     EgMin = 4
     EgMax = 10.6
     Q2Cut = 0.02
+    tSlope = 1.13;
     LUND = 1
     Run = True;
     Seed = 0;
 
     try:
         #opts, args = getopt.getopt(sys.argv[1:], "n:e:t:lhor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND", "Run"])
-        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:lhor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND", "Run", "trig=", "seed=", "docker"])
+        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -e not recognized"
@@ -37,7 +38,7 @@ def main():
     for o, a in opts:
         if o in ("-n", "--trig"):
             Nsim = a
-        elif o in("--seed"):
+        elif o == "--seed":
             Seed = a
         elif o in("--Nperfile"):
             NPerFile = a
@@ -54,15 +55,17 @@ def main():
             EgMin = a;
         elif o in ("--Egmax"):
             EgMax = a;
-        elif o in ("--ltarg"):
+        elif o == "--ltarg":
             Ltarg = a;
         elif o in ("--q2Cut"):
             Q2Cut = a;
-        elif o in ("-l", "--LUND"):
-            LUND = 1
-            print("KUKU")
-            print("LUND is " + str(LUND))
+        elif o == "-s" or o == "-tSlope":
+            print("Kuku tSlope")
+            tSlope = a;     
+        elif o == "-l" or o == "--LUND":
+            LUND = a;
         elif o in ("-r", "--Run"):
+            print("Kuku The option -r")
             Run = True;
         elif o in("--docker"):
             print("With docker")
@@ -83,6 +86,7 @@ def main():
     optFile.write("EgMin    " + str(EgMin) + "\n");
     optFile.write("EgMax    " + str(EgMax) + "\n");
     optFile.write("Q2Cut    " + str(Q2Cut) + "\n");
+    optFile.write("tSlope   " + str(tSlope) + "\n");
     optFile.write("LUND     " + str(LUND)  + "\n");
     optFile.write("Seed     " + str(Seed));
 

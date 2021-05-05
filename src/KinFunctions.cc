@@ -2,6 +2,8 @@
 #include <TMath.h>
 #include <KinFunctions.h>
 
+#include <iostream>
+
 // This is from Byukling Kayanti Formula (6.3)
 double KinFuncs::Lambda( double x, double y, double z )
 {
@@ -60,12 +62,12 @@ double KinFuncs::JPsi_dsigm_dt(double *xx, double *par){
 
   const double R = 1.*Fermi;
   double N_2g = 1.;
-  const double t_slope = 1.13;
+  //const double t_slope = 1.13;
 
   double tM = xx[0];
   double Eg = par[0];
   N_2g = par[1];
-
+  double t_slope = par[2];
   double F_2g = TMath::Exp(t_slope*tM);
   double s = Mp*Mp + 2*Mp*Eg;
   double x = (2*Mp*M_JPsi + M_JPsi*M_JPsi)/(s - Mp*Mp);

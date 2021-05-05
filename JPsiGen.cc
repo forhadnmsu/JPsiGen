@@ -48,6 +48,7 @@ int main() {
     bool isLund;
     double q2_cut;
     double l_targ;
+    double tSlope;
     int n_perfile;
     int seed;
 
@@ -70,6 +71,8 @@ int main() {
             Eg_max = atof(val.c_str());
         } else if (key.compare("Q2Cut") == 0) {
             q2_cut = atof(val.c_str());
+        } else if (key.compare("tSlope") == 0) {
+            tSlope = atof(val.c_str());
         } else if (key.compare("lTarg") == 0) {
             l_targ = atof(val.c_str());
         } else if (key.compare("LUND") == 0) {
@@ -87,6 +90,7 @@ int main() {
     cout << "Eg_min = " << Eg_min << endl;
     cout << "Eg_max = " << Eg_max << endl;
     cout << "q2_cut = " << q2_cut << endl;
+    cout << "tSlope = " << tSlope << endl;
     cout << "IsLund = " << isLund << endl;
     cout<<"**************************************************"<<endl;
     cout<<"*******"<<" RandomSeedActuallyUsed: "<<seed<<" *******"<<endl;
@@ -111,8 +115,9 @@ int main() {
     TRandom2 rand;
     rand.SetSeed(seed);
 
-    TF1 *f_JPsi_dsigm_dt = new TF1("f_JPsi_dsigm_dt", JPsi_dsigm_dt, 8.25, 25., 2);
+    TF1 *f_JPsi_dsigm_dt = new TF1("f_JPsi_dsigm_dt", JPsi_dsigm_dt, 8.25, 25., 3);
     f_JPsi_dsigm_dt->SetParameter(1, SLAC_Fit_scale);
+    f_JPsi_dsigm_dt->SetParameter(2, tSlope);
 
     TTCSKine tcs_kin1(Mp, Eb);
 
