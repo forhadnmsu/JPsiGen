@@ -59,9 +59,9 @@ def main():
             Ltarg = a;
         elif o in ("--q2Cut"):
             Q2Cut = a;
-        elif o == "-s" or o == "-tSlope":
+        elif o == "-s" or o == "--tSlope":
             print("Kuku tSlope")
-            tSlope = a;     
+            tSlope = a;
         elif o == "-l" or o == "--LUND":
             LUND = a;
         elif o in ("-r", "--Run"):
