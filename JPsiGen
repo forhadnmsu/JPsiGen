@@ -11,6 +11,15 @@ def usage():
     print("As an example ");
     print("python jpsigen.py -n 100000 --LUND --Nperfile 35000 -e 10.6 -t -6 --q2Cut 0.02  --ltarg 5 --Run");
 
+def is_number(s, argument):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        print ("The argument of " + argument + " should be number. You provided " + "'"+s+"'" );
+        sys.exit()
+        return False
+
 def main():
 
 # Default values of generator parameters
@@ -37,14 +46,20 @@ def main():
         sys.exit(2)
     for o, a in opts:
         if o in ("-n", "--trig"):
+            is_number(a, o)
             Nsim = a
         elif o == "--seed":
+            is_number(a, o)
             Seed = a
         elif o in("--Nperfile"):
+            is_number(a, o)
             NPerFile = a
         elif o == "-e":
+            is_number(a, o)
             Eb = a
         elif o == "-t":
+            is_number(a, o)
+
             if(float(a) > 0):
                 print("You provided tMax as " + a)
                 print("tMax should be a negative number.")
@@ -52,23 +67,28 @@ def main():
                 sys.exit()
             tLim = a
         elif o in ("--Egmin"):
+            is_number(a, o)
             EgMin = a;
         elif o in ("--Egmax"):
+            is_number(a, o)
             EgMax = a;
         elif o == "--ltarg":
+            is_number(a, o)
             Ltarg = a;
         elif o in ("--q2Cut"):
+            is_number(a, o)
             Q2Cut = a;
         elif o == "-s" or o == "--tSlope":
-            print("Kuku tSlope")
+            is_number(a, o)
             tSlope = a;
         elif o == "-l" or o == "--LUND":
+            is_number(a, o)
             LUND = a;
         elif o in ("-r", "--Run"):
-            print("Kuku The option -r")
+            is_number(a, o)
             Run = True;
         elif o in("--docker"):
-            print("With docker")
+
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
