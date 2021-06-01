@@ -27,3 +27,4 @@ An example command is
 * -q2Cut 0.02           :   In the virtual photon flux use only photons with Q2 < 0.02 GeV^2
 * -lltarg 5             :   The target length is 5 cm, generated vertexes will be unifirmly distributed in the -2.5 to 2.5                               range
 * --Run                 :   Run the generator with specified options
+* --tSlope 1.13 -s 1.13 :   The tSlope
