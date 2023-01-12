@@ -35,10 +35,13 @@ def main():
     LUND = 1
     Run = True;
     Seed = 0;
+    vz_Max =  2.5;
+    vz_Min = -2.5;
+
 
     try:
         #opts, args = getopt.getopt(sys.argv[1:], "n:e:t:lhor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND", "Run"])
-        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope="])
+        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope=", "vzMin=", "vzMax="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -e not recognized"
@@ -78,6 +81,10 @@ def main():
         elif o in ("--q2Cut"):
             is_number(a, o)
             Q2Cut = a;
+        elif o in ("--vzMin"):
+            vz_min = a;
+        elif o in ("--vzMax"):
+            vz_max = a;
         elif o == "-s" or o == "--tSlope":
             is_number(a, o)
             tSlope = a;
@@ -88,7 +95,7 @@ def main():
             is_number(a, o)
             Run = True;
         elif o in("--docker"):
-
+            print("With docker")
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
@@ -105,6 +112,8 @@ def main():
     optFile.write("lTarg    " + str(Ltarg) + "\n");
     optFile.write("EgMin    " + str(EgMin) + "\n");
     optFile.write("EgMax    " + str(EgMax) + "\n");
+    optFile.write("vzMax    " + str(vz_max) + "\n");
+    optFile.write("vzMin    " + str(vz_min) + "\n");
     optFile.write("Q2Cut    " + str(Q2Cut) + "\n");
     optFile.write("tSlope   " + str(tSlope) + "\n");
     optFile.write("LUND     " + str(LUND)  + "\n");
