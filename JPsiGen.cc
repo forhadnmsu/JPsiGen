@@ -51,6 +51,9 @@ int main() {
     double tSlope;
     int n_perfile;
     int seed;
+    double vz_max;
+    double vz_min;
+
 
     for (map<std::string, std::string>::iterator it = m_Settings.begin(); it != m_Settings.end(); it++) {
 
@@ -79,7 +82,12 @@ int main() {
             isLund = atof(val.c_str());
         } else if (key.compare("Seed") == 0) {
             seed = atoi(val.c_str());
+        } else if( key.compare("vzMax") == 0 ){
+            vz_max = atof(val.c_str());
+        }else if( key.compare("vzMin") == 0 ){
+            vz_min = atof(val.c_str());
         }
+
 
 
     }
@@ -90,6 +98,8 @@ int main() {
     cout << "Eg_min = " << Eg_min << endl;
     cout << "Eg_max = " << Eg_max << endl;
     cout << "q2_cut = " << q2_cut << endl;
+    cout << "vz_max = " << vz_max << endl;
+    cout << "vz_min = " << vz_min << endl;
     cout << "tSlope = " << tSlope << endl;
     cout << "IsLund = " << isLund << endl;
     cout<<"**************************************************"<<endl;
@@ -265,7 +275,7 @@ int main() {
 
             double eta = Q2 / (2 * (s - Mp * Mp) - Q2);
 
-            double vz = rand.Uniform(-l_targ / 2., l_targ / 2.);
+            double vz = rand.Uniform( vz_min, vz_max);
 
             px_prot = L_prot.Px();
             py_prot = L_prot.Py();
