@@ -35,8 +35,8 @@ def main():
     LUND = 1
     Run = True;
     Seed = 0;
-    vz_Max =  2.5;
-    vz_Min = -2.5;
+    vz_max =  2.5;
+    vz_min = -2.5;
 
 
     try:
