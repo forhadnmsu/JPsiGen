@@ -185,15 +185,6 @@ int main() {
             cout.flush() << "Processed " << i << " events, approximetely " << double(100. * i / double(Nsim)) << "%\r";
         }
 
-        //        if ((i + 1) % n_perfile == 0) {
-        //            if (isLund) {
-        //                Lund_out.close();
-        //                file_number++;
-        //                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        //                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        //            }
-        //        }
-
         Q2 = MJPsi*MJPsi;
 
         double psf_Eg = Eg_max - Eg_min;
@@ -211,13 +202,8 @@ int main() {
             float fl_s = (float) s;
             float fl_t = (float) t;
 
-            //cout<<"==== JPSi cross section   "<<jpsi_dsdt_(&fl_s, &fl_t)<<endl;
-
-            //crs_JPsi = JPsi_dsdt(s, t);
             f_JPsi_dsigm_dt->SetParameter(0, Eg);
             crs_JPsi = f_JPsi_dsigm_dt->Eval(t);
-            //cout<<"Q2 = "<<Q2<<"     JPsi dSdt = "<<crs_JPsi<<endl;
-
 
             double u = 2 * Mp * Mp + Q2 - s - t;
             double th_qprime = acos((s * (t - u) - Mp * Mp * (Q2 - Mp * Mp)) / sqrt(Lambda(s, 0, Mp * Mp) * Lambda(s, Q2, Mp * Mp))); //Byukling Kayanti (4.9)
@@ -254,10 +240,6 @@ int main() {
 
             L_gprime.Boost(Lcm.BoostVector());
             L_prot.Boost(Lcm.BoostVector());
-
-            //cout<<"test = "<<tcs_kin1.GetMM2()<<endl;
-            //cout<<"phi_cm = "<<phi_cm*TMath::RadToDeg()<<"  tcs_kine.GetPhi_cm()"<<tcs_kin1.GetPhi_cm()<<endl;
-            //cout<<"phi_cm = "<<phi_cm*TMath::RadToDeg()<<"  tcs_kine.GetPhi_cm()"<<tcs_kin1.GetPhi_cm()<<endl;
 
             double psf_phi_lab = 2 * PI;
             double phi_rot = rand.Uniform(0., psf_phi_lab);
