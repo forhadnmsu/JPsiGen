@@ -37,11 +37,12 @@ def main():
     Seed = 0;
     vz_max =  2.5;
     vz_min = -2.5;
+    Fermi  = 0;
 
 
     try:
         #opts, args = getopt.getopt(sys.argv[1:], "n:e:t:lhor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND", "Run"])
-        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope=", "vzMin=", "vzMax="])
+        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope=", "vzMin=", "vzMax=", "Fermi="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -e not recognized"
@@ -91,6 +92,9 @@ def main():
         elif o == "-l" or o == "--LUND":
             is_number(a, o)
             LUND = a;
+        elif o == "--Fermi":
+            is_number(a, o)
+            Fermi = a
         elif o in ("-r", "--Run"):
             is_number(a, o)
             Run = True;
@@ -117,7 +121,8 @@ def main():
     optFile.write("Q2Cut    " + str(Q2Cut) + "\n");
     optFile.write("tSlope   " + str(tSlope) + "\n");
     optFile.write("LUND     " + str(LUND)  + "\n");
-    optFile.write("Seed     " + str(Seed));
+    optFile.write("Seed     " + str(Seed) + "\n");
+    optFile.write("Fermi    " + str(Fermi));
 
     optFile.close()
 
