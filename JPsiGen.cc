@@ -206,7 +206,7 @@ int main() {
 
         h_P_Fermi1->Fill(p_prot_Fermi);
 
-        double cosThFermi = rand.Uniform(-1., -1);
+        double cosThFermi = rand.Uniform(-1., 1);
         double sinThFermi = sqrt(1. - cosThFermi * cosThFermi);
         double phiFermi = rand.Uniform(0, 2 * PI);
 
@@ -221,6 +221,14 @@ int main() {
                 
         double Eg_min = TMath::Max(Eg_minUser, Eg_thr);
         
+        // When it happens that because of the Fermi momentum the threshold the Eg threshold becomes higher
+        // than the Eg_max, then this is "not possible (or undesired) kinematics", so le't skip this event
+        if( Eg_thr > Eg_max ){
+            i = i - 1;
+            cout<<"Eg threshold is higher than Eg_max. Will skip this event"<<endl;
+            cout<<"P_Fermi = "<<p_prot_Fermi<<"   costThFermi = "<<cosThFermi<<"   Eg_Threshold = "<<Eg_thr<<endl;
+            continue;
+        }
 
         double psf_Eg = Eg_max - Eg_min;
 
