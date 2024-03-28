@@ -43,7 +43,8 @@ int main() {
     int Nsim;
     double Eb;
     double t_lim;
-    double Eg_min;
+    double Eg_minUser; // Eg min defined by the user, however, 
+                       // if it is below the J/Psi production threshold, then the threshold value will be used for Egmin
     double Eg_max;
     bool isLund;
     double q2_cut;
@@ -53,6 +54,7 @@ int main() {
     int seed;
     double vz_max;
     double vz_min;
+    bool isFermi;
 
 
     for (map<std::string, std::string>::iterator it = m_Settings.begin(); it != m_Settings.end(); it++) {
@@ -69,7 +71,7 @@ int main() {
         } else if (key.compare("tLim") == 0) {
             t_lim = atof(val.c_str());
         } else if (key.compare("EgMin") == 0) {
-            Eg_min = atof(val.c_str());
+            Eg_minUser = atof(val.c_str());
         } else if (key.compare("EgMax") == 0) {
             Eg_max = atof(val.c_str());
         } else if (key.compare("Q2Cut") == 0) {
@@ -82,29 +84,18 @@ int main() {
             isLund = atof(val.c_str());
         } else if (key.compare("Seed") == 0) {
             seed = atoi(val.c_str());
-        } else if( key.compare("vzMax") == 0 ){
+        } else if (key.compare("vzMax") == 0) {
             vz_max = atof(val.c_str());
-        }else if( key.compare("vzMin") == 0 ){
+        } else if (key.compare("vzMin") == 0) {
             vz_min = atof(val.c_str());
+        } else if (key.compare("Fermi") == 0) {
+            isFermi = atof(val.c_str());
         }
 
 
 
     }
 
-    cout << "Nsim = " << Nsim << endl;
-    cout << "Eb = " << Eb << endl;
-    cout << "t_lim = " << t_lim << endl;
-    cout << "Eg_min = " << Eg_min << endl;
-    cout << "Eg_max = " << Eg_max << endl;
-    cout << "q2_cut = " << q2_cut << endl;
-    cout << "vz_max = " << vz_max << endl;
-    cout << "vz_min = " << vz_min << endl;
-    cout << "tSlope = " << tSlope << endl;
-    cout << "IsLund = " << isLund << endl;
-    cout<<"**************************************************"<<endl;
-    cout<<"*******"<<" RandomSeedActuallyUsed: "<<seed<<" *******"<<endl;
-    cout<<"**************************************************"<<endl;
 
 
     const double PI = 3.14159265358979312;
@@ -113,11 +104,28 @@ int main() {
     const double Me = 0.00051;
     const double MJPsi = 3.097;
 
-    Eg_min = MJPsi * (MJPsi + 2 * Mp) / (2 * Mp); //Gev
-    Eg_max = Eb; //GeV
-    //  const double Minv_min = sqrt(Mp*Mp + 2*Mp*Eg_min ) - Mp;
-    const double Q2min = 2 * Mp * Eg_min + t_lim - (Eg_min / Mp)*(2 * Mp * Mp - t_lim - sqrt(t_lim * t_lim - 4 * Mp * Mp * t_lim));
-    const double Minv_min = sqrt(Q2min);
+    if (Eg_max > Eb) {
+        cout<<" ******* W A R N I N G ******** "<<endl;
+        cout<<" ** Eg_max is "<<Eg_max<<" GeV, while the beam energy is only "<<Eb<<" GeV. "<<endl;
+        cout<<" ** As a Eg_max the beam energy "<<Eb<<" GeV will be used"<<endl;
+        Eg_max = Eb; //GeV
+    }
+
+    cout << "Nsim   = " << Nsim << endl;
+    cout << "Eb     = " << Eb << endl;
+    cout << "t_lim  = " << t_lim << endl;
+    cout << "Eg_min = " << Eg_minUser << endl;
+    cout << "Eg_max = " << Eg_max << endl;
+    cout << "q2_cut = " << q2_cut << endl;
+    cout << "vz_max = " << vz_max << endl;
+    cout << "vz_min = " << vz_min << endl;
+    cout << "tSlope = " << tSlope << endl;
+    cout << "IsLund = " << isLund << endl;
+    cout << "**************************************************" << endl;
+    cout << "*******" << " RandomSeedActuallyUsed: " << seed << " *******" << endl;
+    cout << "**************************************************" << endl;
+
+
     const double SLAC_Fit_scale = 7.79117e-23;
 
     bool write_root = !isLund;
@@ -129,9 +137,10 @@ int main() {
     f_JPsi_dsigm_dt->SetParameter(1, SLAC_Fit_scale);
     f_JPsi_dsigm_dt->SetParameter(2, tSlope);
 
+    TF1 *f_FermiDistr = new TF1("f_FermiDistr", Fermi_Distribution, 0., 1, 0);
+
     TTCSKine tcs_kin1(Mp, Eb);
 
-    TLorentzVector target(0., 0., 0., Mp);
     TLorentzVector Lcm;
 
     TFile *file_out;
@@ -147,11 +156,14 @@ int main() {
     TH2D *h_ph_h_ph_cm1 = new TH2D("h_ph_h_ph_cm1", "", 200, 0., 360., 200, 0., 360.);
     TH2D *h_th_g_th_cm1 = new TH2D("h_th_g_th_cm1", "", 200, 0., 180., 200, 0., 180.);
 
+    TH1D *h_P_Fermi1 = new TH1D("h_P_Fermi1", "", 200, 0., 1.05);
+
     //================= Definition of Tree Variables =================
     double Eg, Minv, t, Q2;
     double psf, crs_BH, crs_INT, crs_int, crs_JPsi;
     double psf_flux, flux_factor;
     TLorentzVector L_em, L_ep, L_prot;
+    TLorentzVector L_ProtFermi, L_gamma;
     TLorentzVector L_gprime;
 
     double px_prot, py_prot, pz_prot, E_prot;
@@ -185,22 +197,45 @@ int main() {
             cout.flush() << "Processed " << i << " events, approximetely " << double(100. * i / double(Nsim)) << "%\r";
         }
 
-        //        if ((i + 1) % n_perfile == 0) {
-        //            if (isLund) {
-        //                Lund_out.close();
-        //                file_number++;
-        //                //Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        //                Lund_out.open(Form("JPsi_gen_%d.txt", file_number), ofstream::out);
-        //            }
-        //        }
-
         Q2 = MJPsi*MJPsi;
+        
+        // Check if Fermi option is active, if so generrate Fermi momentum for proton,
+        // Otherwise the proton is at rest
+         // Let's take it in the range of 0 to 1 GeV
+        double p_prot_Fermi = isFermi ? f_FermiDistr->GetRandom(0., 1.) : 0;
+
+        h_P_Fermi1->Fill(p_prot_Fermi);
+
+        double cosThFermi = rand.Uniform(-1., 1);
+        double sinThFermi = sqrt(1. - cosThFermi * cosThFermi);
+        double phiFermi = rand.Uniform(0, 2 * PI);
+
+        double pxFermi = p_prot_Fermi * sinThFermi * cos(phiFermi);
+        double pyFermi = p_prot_Fermi * sinThFermi * sin(phiFermi);
+        double pzFermi = p_prot_Fermi*cosThFermi;
+        double EFermi = sqrt(p_prot_Fermi * p_prot_Fermi + Mp * Mp);
+
+        //***** The Eg Threshld in the Lab frae is calculated as  *****
+        double EgMin_CM = (MJPsi * MJPsi + 2 * Mp * MJPsi) / (2 * (Mp + MJPsi));
+        double Eg_thr = (MJPsi * MJPsi + 2 * Mp * MJPsi) / (2 * (EFermi - p_prot_Fermi * cosThFermi));
+                
+        double Eg_min = TMath::Max(Eg_minUser, Eg_thr);
+        
+        // When it happens that because of the Fermi momentum the threshold the Eg threshold becomes higher
+        // than the Eg_max, then this is "not possible (or undesired) kinematics", so le't skip this event
+        if( Eg_thr > Eg_max ){
+            i = i - 1;
+            cout<<"Eg threshold is higher than Eg_max. Will skip this event"<<endl;
+            cout<<"P_Fermi = "<<p_prot_Fermi<<"   costThFermi = "<<cosThFermi<<"   Eg_Threshold = "<<Eg_thr<<endl;
+            continue;
+        }
 
         double psf_Eg = Eg_max - Eg_min;
+
         Eg = rand.Uniform(Eg_min, Eg_min + psf_Eg);
         flux_factor = N_EPA(Eb, Eg, q2_cut) + N_Brem(Eg, Eb);
-        
-        double s = Mp * Mp + 2 * Mp*Eg;
+
+        double s = Mp * Mp + 2 * Eg*(EFermi - p_prot_Fermi*cosThFermi );
         double t_min = T_min(0., Mp*Mp, Q2, Mp*Mp, s);
         double t_max = T_max(0., Mp*Mp, Q2, Mp*Mp, s);
         double psf_t = t_min - TMath::Max(t_max, t_lim);
@@ -210,14 +245,15 @@ int main() {
 
             float fl_s = (float) s;
             float fl_t = (float) t;
-
-            //cout<<"==== JPSi cross section   "<<jpsi_dsdt_(&fl_s, &fl_t)<<endl;
-
-            //crs_JPsi = JPsi_dsdt(s, t);
-            f_JPsi_dsigm_dt->SetParameter(0, Eg);
+            
+            // The x-sec is obtained in the frame where the proton is at rest, so we should move to that
+            // frame, get the value of Eg, and estimate the cross-section.
+            L_ProtFermi.SetPxPyPzE(pxFermi, pyFermi, pzFermi, EFermi);
+            L_gamma.SetPxPyPzE(0, 0, Eg, Eg);
+            L_gamma.Boost( -L_ProtFermi.BoostVector() );
+            double Eg_ProtRestFrame = L_gamma.E();
+            f_JPsi_dsigm_dt->SetParameter(0, Eg_ProtRestFrame);
             crs_JPsi = f_JPsi_dsigm_dt->Eval(t);
-            //cout<<"Q2 = "<<Q2<<"     JPsi dSdt = "<<crs_JPsi<<endl;
-
 
             double u = 2 * Mp * Mp + Q2 - s - t;
             double th_qprime = acos((s * (t - u) - Mp * Mp * (Q2 - Mp * Mp)) / sqrt(Lambda(s, 0, Mp * Mp) * Lambda(s, Q2, Mp * Mp))); //Byukling Kayanti (4.9)
@@ -225,7 +261,8 @@ int main() {
 
             double Pprime = 0.5 * sqrt(Lambda(s, Q2, Mp * Mp) / s); // Momentum in c.m. it is the same for q_pr and p_pr
 
-            Lcm.SetPxPyPzE(0., 0., Eg, Mp + Eg);
+            // ** The LorentzVector of CM frame is equal L_gamma + L_proton_Fermi
+            Lcm.SetPxPyPzE(pxFermi, pyFermi, pzFermi + Eg, EFermi + Eg);
             L_prot.SetPxPyPzE(Pprime * sin(th_pprime), 0., Pprime * cos(th_pprime), sqrt(Pprime * Pprime + Mp * Mp));
             L_gprime.SetPxPyPzE(Pprime * sin(th_qprime), 0., Pprime * cos(th_qprime), sqrt(Pprime * Pprime + Q2));
 
@@ -255,10 +292,6 @@ int main() {
             L_gprime.Boost(Lcm.BoostVector());
             L_prot.Boost(Lcm.BoostVector());
 
-            //cout<<"test = "<<tcs_kin1.GetMM2()<<endl;
-            //cout<<"phi_cm = "<<phi_cm*TMath::RadToDeg()<<"  tcs_kine.GetPhi_cm()"<<tcs_kin1.GetPhi_cm()<<endl;
-            //cout<<"phi_cm = "<<phi_cm*TMath::RadToDeg()<<"  tcs_kine.GetPhi_cm()"<<tcs_kin1.GetPhi_cm()<<endl;
-
             double psf_phi_lab = 2 * PI;
             double phi_rot = rand.Uniform(0., psf_phi_lab);
 
@@ -275,7 +308,7 @@ int main() {
 
             double eta = Q2 / (2 * (s - Mp * Mp) - Q2);
 
-            double vz = rand.Uniform( vz_min, vz_max);
+            double vz = rand.Uniform(vz_min, vz_max);
 
             px_prot = L_prot.Px();
             py_prot = L_prot.Py();
@@ -321,6 +354,7 @@ int main() {
         tr1->Write();
         h_ph_h_ph_cm1->Write();
         h_th_g_th_cm1->Write();
+        h_P_Fermi1->Write();
         file_out->Close();
     }
 }

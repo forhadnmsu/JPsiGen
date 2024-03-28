@@ -5,5 +5,10 @@ tLim     -6.0
 lTarg    5.0
 EgMin    4
 EgMax    10.6
+vzMax    2.5
+vzMin    -2.5
 Q2Cut    0.02
+tSlope   1.13
 LUND     0
+Seed     0
+Fermi    0
