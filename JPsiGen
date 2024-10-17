@@ -7,9 +7,25 @@ import sys
 
 def usage():
     print("The usage:");
-    print("python jpsigen.py -n Nsim -e Ebeam -t t_lim --Egmin Egmin --Egmax Egmax --q2Cut Q2CutValue -l (write output in LUND file)");
+    #print("python jpsigen.py -n Nsim -e Ebeam -t t_lim --Egmin Egmin --Egmax Egmax --q2Cut Q2CutValue -l (write output in LUND file)");
+    print("python jpsigen.py options");
+    print("     Available options:")
+    print("-n or --trig                      Number of events to be generated")
+    print("--seed                            The seed to be used in the random generator")
+    print("--Nperfile                        Maximum number of events to be used in the file, if number of events reaches this number, a new file is created   ")
+    print("-e                                The electron beam energy")
+    print("-t                                t_max limit in [GeV], should be a negative number")
+    print("--q2Cut                           Max Q2 for calculating the photon flux in [GeV]")
+    print("--vzMin                           Min z coordinate for the generated vertext")
+    print("--vzMax                           Max z coordinate for the generated vertext")
+    print("-s or --tSlope                    The -t slope of the cross-section dependence on -t")
+    print("-l ot --LUND                      if one, then write events in the LUND file, otherwise events will be written in a root file")
+    print("--Fermi                           The target nucleon will have an initial Fermi momentum")
+    print("-r or --Run                       Run the JPsiGen.exe in the current directory, otherwise let it find the path")
+    print("-h or--help                       Print this message")
+    print("\n\n");
     print("As an example ");
-    print("python jpsigen.py -n 100000 --LUND --Nperfile 35000 -e 10.6 -t -6 --q2Cut 0.02  --ltarg 5 --Run");
+    print("python jpsigen.py -n 100000 --LUND --Nperfile 35000 -e 10.6 -t -6 --q2Cut 0.02 --Run");
 
 def is_number(s, argument):
     try:
@@ -27,7 +43,6 @@ def main():
     NPerFile = 10000
     Eb = 10.6
     tLim = -6.
-    Ltarg = 5.
     EgMin = 4
     EgMax = 10.6
     Q2Cut = 0.02
@@ -38,11 +53,12 @@ def main():
     vz_max =  2.5;
     vz_min = -2.5;
     Fermi  = 0;
+    LepType = 0;
 
 
     try:
         #opts, args = getopt.getopt(sys.argv[1:], "n:e:t:lhor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND", "Run"])
-        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "ltarg=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope=", "vzMin=", "vzMax=", "Fermi="])
+        opts, args = getopt.getopt(sys.argv[1:], "n:e:t:s:l:hor", ["help", "output=", "Nperfile=", "Egmin=", "Egmax=", "q2Cut=", "LUND=", "Run", "trig=", "seed=", "docker", "tSlope=", "vzMin=", "vzMax=", "Fermi=", "lep="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -e not recognized"
@@ -76,9 +92,6 @@ def main():
         elif o in ("--Egmax"):
             is_number(a, o)
             EgMax = a;
-        elif o == "--ltarg":
-            is_number(a, o)
-            Ltarg = a;
         elif o in ("--q2Cut"):
             is_number(a, o)
             Q2Cut = a;
@@ -95,6 +108,9 @@ def main():
         elif o == "--Fermi":
             is_number(a, o)
             Fermi = a
+        elif o == "--lep":
+            is_number(a, o)
+            LepType = a
         elif o in ("-r", "--Run"):
             is_number(a, o)
             Run = True;
@@ -113,7 +129,6 @@ def main():
     optFile.write("NPerFile " + str(NPerFile) + "\n");
     optFile.write("Eb       " + str(Eb) + "\n");
     optFile.write("tLim     " + str(tLim)  + "\n");
-    optFile.write("lTarg    " + str(Ltarg) + "\n");
     optFile.write("EgMin    " + str(EgMin) + "\n");
     optFile.write("EgMax    " + str(EgMax) + "\n");
     optFile.write("vzMax    " + str(vz_max) + "\n");
@@ -122,7 +137,8 @@ def main():
     optFile.write("tSlope   " + str(tSlope) + "\n");
     optFile.write("LUND     " + str(LUND)  + "\n");
     optFile.write("Seed     " + str(Seed) + "\n");
-    optFile.write("Fermi    " + str(Fermi));
+    optFile.write("Fermi    " + str(Fermi) + "\n");
+    optFile.write("LepType  " + str(LepType));
 
     optFile.close()
 

@@ -48,7 +48,6 @@ int main() {
     double Eg_max;
     bool isLund;
     double q2_cut;
-    double l_targ;
     double tSlope;
     int n_perfile;
     int seed;
@@ -79,8 +78,6 @@ int main() {
             q2_cut = atof(val.c_str());
         } else if (key.compare("tSlope") == 0) {
             tSlope = atof(val.c_str());
-        } else if (key.compare("lTarg") == 0) {
-            l_targ = atof(val.c_str());
         } else if (key.compare("LUND") == 0) {
             isLund = atof(val.c_str());
         } else if (key.compare("Seed") == 0) {
