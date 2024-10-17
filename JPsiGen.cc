@@ -221,7 +221,7 @@ int main() {
                 
         double Eg_min = TMath::Max(Eg_minUser, Eg_thr);
         
-        // When it happens that because of the Fermi momentum the threshold the Eg threshold becomes higher
+        // When it happens that because of the Fermi momentum the Eg threshold becomes higher
         // than the Eg_max, then this is "not possible (or undesired) kinematics", so le't skip this event
         if( Eg_thr > Eg_max ){
             i = i - 1;
@@ -242,9 +242,6 @@ int main() {
 
         if (t_min > t_lim) {
             t = rand.Uniform(t_min - psf_t, t_min);
-
-            float fl_s = (float) s;
-            float fl_t = (float) t;
             
             // The x-sec is obtained in the frame where the proton is at rest, so we should move to that
             // frame, get the value of Eg, and estimate the cross-section.
@@ -287,7 +284,6 @@ int main() {
 
             L_em.Boost(Lcm.BoostVector()); // Move to the Lab Frame
             L_ep.Boost(Lcm.BoostVector()); // Move to the Lab Frame
-
 
             L_gprime.Boost(Lcm.BoostVector());
             L_prot.Boost(Lcm.BoostVector());
