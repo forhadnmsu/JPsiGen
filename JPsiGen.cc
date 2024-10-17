@@ -56,6 +56,7 @@ int main() {
     double vz_min;
     bool isFermi;
 
+    int lepType; // Lepton Type: 0=e-/e+, 1=mu-/mu+ 
 
     for (map<std::string, std::string>::iterator it = m_Settings.begin(); it != m_Settings.end(); it++) {
 
@@ -90,9 +91,9 @@ int main() {
             vz_min = atof(val.c_str());
         } else if (key.compare("Fermi") == 0) {
             isFermi = atof(val.c_str());
+        }else if ( key.compare("LepType") == 0 ){
+            lepType = atoi(val.c_str());
         }
-
-
 
     }
 
@@ -102,8 +103,23 @@ int main() {
     const double radian = 57.2957795130823229;
     const double Mp = 0.9383;
     const double Me = 0.00051;
+    const double Mmu = 0.105658;
     const double MJPsi = 3.097;
-
+    std::map<int, double> m_leptonMass;
+    m_leptonMass[0] = Me;
+    m_leptonMass[1] = Mmu;
+    
+    std::map<int, int> m_posLeptonPID;
+    std::map<int, int> m_negLeptonPID;
+    m_posLeptonPID[0] = -11;
+    m_posLeptonPID[1] = -13;
+    m_negLeptonPID[0] = 11;
+    m_negLeptonPID[1] = 13;
+    
+    std::map<int, std::string> m_leptonType;
+    m_leptonType[0] = "e-/e+";
+    m_leptonType[1] = "mu-/mu+";
+    
     if (Eg_max > Eb) {
         cout<<" ******* W A R N I N G ******** "<<endl;
         cout<<" ** Eg_max is "<<Eg_max<<" GeV, while the beam energy is only "<<Eb<<" GeV. "<<endl;
@@ -111,16 +127,29 @@ int main() {
         Eg_max = Eb; //GeV
     }
 
-    cout << "Nsim   = " << Nsim << endl;
-    cout << "Eb     = " << Eb << endl;
-    cout << "t_lim  = " << t_lim << endl;
-    cout << "Eg_min = " << Eg_minUser << endl;
-    cout << "Eg_max = " << Eg_max << endl;
-    cout << "q2_cut = " << q2_cut << endl;
-    cout << "vz_max = " << vz_max << endl;
-    cout << "vz_min = " << vz_min << endl;
-    cout << "tSlope = " << tSlope << endl;
-    cout << "IsLund = " << isLund << endl;
+    if( !(lepType == 0 || lepType == 1) ){
+        cout<<"Wrong Lepton Type is provided. The value is "<<lepType<<endl;
+        cout<<"It should be 0 or 1"<<endl;
+        cout<<"Exiting."<<endl;
+        exit(1);
+    }
+        
+    const double m_l = m_leptonMass[lepType];
+    const int pid_pos_lep = m_posLeptonPID[lepType];
+    const int pid_neg_lep = m_negLeptonPID[lepType];
+    const std::string lep_name = m_leptonType[lepType];
+    
+    cout << "Nsim           = " << Nsim << endl;
+    cout << "Eb             = " << Eb << endl;
+    cout << "t_lim          = " << t_lim << endl;
+    cout << "Eg_min         = " << Eg_minUser << endl;
+    cout << "Eg_max         = " << Eg_max << endl;
+    cout << "q2_cut         = " << q2_cut << endl;
+    cout << "vz_max         = " << vz_max << endl;
+    cout << "vz_min         = " << vz_min << endl;
+    cout << "tSlope         = " << tSlope << endl;
+    cout << "IsLund         = " << isLund << endl;
+    cout << "LepType        = " << lep_name << endl;
     cout << "**************************************************" << endl;
     cout << "*******" << " RandomSeedActuallyUsed: " << seed << " *******" << endl;
     cout << "**************************************************" << endl;
@@ -162,18 +191,18 @@ int main() {
     double Eg, Minv, t, Q2;
     double psf, crs_BH, crs_INT, crs_int, crs_JPsi;
     double psf_flux, flux_factor;
-    TLorentzVector L_em, L_ep, L_prot;
+    TLorentzVector L_lm, L_lp, L_prot;
     TLorentzVector L_ProtFermi, L_gamma;
     TLorentzVector L_gprime;
 
     double px_prot, py_prot, pz_prot, E_prot;
-    double px_ep, py_ep, pz_ep, E_ep;
-    double px_em, py_em, pz_em, E_em;
+    double px_lp, py_lp, pz_lp, E_lp;
+    double px_lm, py_lm, pz_lm, E_lm;
 
 
     TTree *tr1 = new TTree("tr1", "TCS MC events");
-    tr1->Branch("L_em", "TLorentzVector", &L_em, 3200, 99);
-    tr1->Branch("L_ep", "TLorentzVector", &L_ep, 3200, 99);
+    tr1->Branch("L_lm", "TLorentzVector", &L_lm, 3200, 99);
+    tr1->Branch("L_lp", "TLorentzVector", &L_lp, 3200, 99);
     tr1->Branch("L_prot", "TLorentzVector", &L_prot, 3200, 99);
     tr1->Branch("Eg", &Eg, "Eg/D");
     tr1->Branch("Q2", &Q2, "Q2/D");
@@ -184,12 +213,12 @@ int main() {
     tr1->Branch("px_prot", &px_prot, "px_prot/D");
     tr1->Branch("py_prot", &py_prot, "py_prot/D");
     tr1->Branch("pz_prot", &pz_prot, "pz_prot/D");
-    tr1->Branch("px_ep", &px_ep, "px_ep/D");
-    tr1->Branch("py_ep", &py_ep, "py_ep/D");
-    tr1->Branch("pz_ep", &pz_ep, "pz_ep/D");
-    tr1->Branch("px_em", &px_em, "px_em/D");
-    tr1->Branch("py_em", &py_em, "py_em/D");
-    tr1->Branch("pz_em", &pz_em, "pz_em/D");
+    tr1->Branch("px_lp", &px_lp, "px_lp/D");
+    tr1->Branch("py_lp", &py_lp, "py_lp/D");
+    tr1->Branch("pz_lp", &pz_lp, "pz_lp/D");
+    tr1->Branch("px_lm", &px_lm, "px_lm/D");
+    tr1->Branch("py_lm", &py_lm, "py_lm/D");
+    tr1->Branch("pz_lm", &pz_lm, "pz_lm/D");
 
     for (int i = 0; i < Nsim; i++) {
 
@@ -271,19 +300,19 @@ int main() {
             double phi_cm = rand.Uniform(0., 0. + psf_phi_cm);
 
             double El = sqrt(Q2) / 2.; // Energy of lepton in the rest frame of qprime
-            double Pl = sqrt(El * El - Me * Me);
+            double Pl = sqrt(El * El - m_l * m_l);
 
-            L_em.SetPxPyPzE(Pl * sin_th * cos(phi_cm), Pl * sin_th * sin(phi_cm), Pl*cos_th, El);
-            L_ep.SetPxPyPzE(-Pl * sin_th * cos(phi_cm), -Pl * sin_th * sin(phi_cm), -Pl*cos_th, El);
+            L_lm.SetPxPyPzE(Pl * sin_th * cos(phi_cm), Pl * sin_th * sin(phi_cm), Pl*cos_th, El);
+            L_lp.SetPxPyPzE(-Pl * sin_th * cos(phi_cm), -Pl * sin_th * sin(phi_cm), -Pl*cos_th, El);
 
-            L_em.RotateY(th_qprime); // Rotate in order to get Z axis be antiparallel to the p_prime direction in the CM frame
-            L_ep.RotateY(th_qprime); // Rotate in order to get Z axis be antiparallel to the p_prime direction in the CM frame
+            L_lm.RotateY(th_qprime); // Rotate in order to get Z axis be antiparallel to the p_prime direction in the CM frame
+            L_lp.RotateY(th_qprime); // Rotate in order to get Z axis be antiparallel to the p_prime direction in the CM frame
 
-            L_em.Boost(L_gprime.BoostVector()); // Move to the CM Frame
-            L_ep.Boost(L_gprime.BoostVector()); // Move to the CM Frame
+            L_lm.Boost(L_gprime.BoostVector()); // Move to the CM Frame
+            L_lp.Boost(L_gprime.BoostVector()); // Move to the CM Frame
 
-            L_em.Boost(Lcm.BoostVector()); // Move to the Lab Frame
-            L_ep.Boost(Lcm.BoostVector()); // Move to the Lab Frame
+            L_lm.Boost(Lcm.BoostVector()); // Move to the Lab Frame
+            L_lp.Boost(Lcm.BoostVector()); // Move to the Lab Frame
 
             L_gprime.Boost(Lcm.BoostVector());
             L_prot.Boost(Lcm.BoostVector());
@@ -293,9 +322,11 @@ int main() {
 
             L_prot.RotateZ(phi_rot);
             L_gprime.RotateZ(phi_rot);
-            L_em.RotateZ(phi_rot);
-            L_ep.RotateZ(phi_rot);
-            tcs_kin1.SetLemLepLp(L_em, L_ep, L_prot);
+            L_lm.RotateZ(phi_rot);
+            L_lp.RotateZ(phi_rot);
+            
+            
+            tcs_kin1.SetLemLepLp(L_lm, L_lp, L_prot);
 
             h_ph_h_ph_cm1->Fill(phi_cm * TMath::RadToDeg(), tcs_kin1.GetPhi_cm());
             h_th_g_th_cm1->Fill(acos(cos_th) * TMath::RadToDeg(), tcs_kin1.GetTheta_cm());
@@ -310,14 +341,14 @@ int main() {
             py_prot = L_prot.Py();
             pz_prot = L_prot.Pz();
             E_prot = L_prot.E();
-            px_ep = L_ep.Px();
-            py_ep = L_ep.Py();
-            pz_ep = L_ep.Pz();
-            E_ep = L_ep.E();
-            px_em = L_em.Px();
-            py_em = L_em.Py();
-            pz_em = L_em.Pz();
-            E_em = L_em.E();
+            px_lp = L_lp.Px();
+            py_lp = L_lp.Py();
+            pz_lp = L_lp.Pz();
+            E_lp = L_lp.E();
+            px_lm = L_lm.Px();
+            py_lm = L_lm.Py();
+            pz_lm = L_lm.Pz();
+            E_lm = L_lm.E();
 
 
             double tot_weight = crs_JPsi * psf*flux_factor;
@@ -331,11 +362,11 @@ int main() {
                 Lund_out << 1 << setw(5) << 1 << setw(5) << 1 << setw(7) << 2212 << setw(5) << 0 << setw(5) << 0 << setw(15) << px_prot << setw(15) << py_prot << setw(15) << pz_prot;
                 Lund_out << setw(15) << L_prot.E() << setw(15) << Mp << setw(15) << 0. << setw(15) << 0. << setw(15) << vz << endl;
                 // Writing Electron
-                Lund_out << 2 << setw(5) << -1 << setw(5) << 1 << setw(7) << 11 << setw(5) << 0 << setw(5) << 0 << setw(15) << px_ep << setw(15) << py_ep << setw(15) << pz_ep;
-                Lund_out << setw(15) << L_em.E() << setw(15) << Me << setw(15) << 0. << setw(15) << 0. << setw(15) << vz << endl;
+                Lund_out << 2 << setw(5) << -1 << setw(5) << 1 << setw(7) << pid_neg_lep << setw(5) << 0 << setw(5) << 0 << setw(15) << px_lm << setw(15) << py_lm << setw(15) << pz_lm;
+                Lund_out << setw(15) << L_lm.E() << setw(15) << m_l << setw(15) << 0. << setw(15) << 0. << setw(15) << vz << endl;
                 // Writing Positron
-                Lund_out << 3 << setw(5) << 1 << setw(5) << 1 << setw(7) << -11 << setw(5) << 0 << setw(5) << 0 << setw(15) << px_em << setw(15) << py_em << setw(15) << pz_em;
-                Lund_out << setw(15) << L_ep.E() << setw(15) << Me << setw(15) << 0. << setw(15) << 0. << setw(15) << vz << endl;
+                Lund_out << 3 << setw(5) << 1 << setw(5) << 1 << setw(7) << pid_pos_lep << setw(5) << 0 << setw(5) << 0 << setw(15) << px_lp << setw(15) << py_lp << setw(15) << pz_lp;
+                Lund_out << setw(15) << L_lp.E() << setw(15) << m_l << setw(15) << 0. << setw(15) << 0. << setw(15) << vz << endl;
             }
         } else {
             cout << " |t_min| > |t_lim|" << endl;
