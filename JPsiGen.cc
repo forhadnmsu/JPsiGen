@@ -182,9 +182,6 @@ int main() {
         Lund_out.open("JPsiGen.dat", ofstream::out);
     }
 
-    TH2D *h_ph_h_ph_cm1 = new TH2D("h_ph_h_ph_cm1", "", 200, 0., 360., 200, 0., 360.);
-    TH2D *h_th_g_th_cm1 = new TH2D("h_th_g_th_cm1", "", 200, 0., 180., 200, 0., 180.);
-
     TH1D *h_P_Fermi1 = new TH1D("h_P_Fermi1", "", 200, 0., 1.05);
 
     //================= Definition of Tree Variables =================
@@ -324,13 +321,7 @@ int main() {
             L_gprime.RotateZ(phi_rot);
             L_lm.RotateZ(phi_rot);
             L_lp.RotateZ(phi_rot);
-            
-            
-            tcs_kin1.SetLemLepLp(L_lm, L_lp, L_prot);
-
-            h_ph_h_ph_cm1->Fill(phi_cm * TMath::RadToDeg(), tcs_kin1.GetPhi_cm());
-            h_th_g_th_cm1->Fill(acos(cos_th) * TMath::RadToDeg(), tcs_kin1.GetTheta_cm());
-
+                        
             psf = psf_t;
 
             double eta = Q2 / (2 * (s - Mp * Mp) - Q2);
@@ -379,8 +370,6 @@ int main() {
 
     if (write_root) {
         tr1->Write();
-        h_ph_h_ph_cm1->Write();
-        h_th_g_th_cm1->Write();
         h_P_Fermi1->Write();
         file_out->Close();
     }
