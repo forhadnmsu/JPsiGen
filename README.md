@@ -1,18 +1,9 @@
 # JPsiGen
 A simple generator that generates exclusive J/psi photo production with it's e-e+ decay mode
 
-********************Istallation***********************
-Prerequisite: You need to have a root installed
-
-In the base directory just running "make" should install build the generator `JPsiGen.exe`
-
-You need to add lib directory in the LD_LIBRARY_PATH
-For example in .csh enviroment you can do the following command
-"setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:`pwd`/lib"
-
+********************Info***********************
 The generator will parse the GenOptions.dat and various parameters of the generator
 are set through this file.
-
 One also can use the python script `GenerateGenOptions.py` if you want to 
 edit the GenOptions.dat file with command line option, or event run the executable with command line arguments.
 
@@ -31,11 +22,17 @@ An example command is
 
 
 # JPsiGen Build and Run Instructions
-
 ```bash
-# Add JLab software module path
+# SSH into JLab
+ssh -Y your_jlab_username@scilogin.jlab.org
+ssh -Y ifarm
+
+# Clone the repository
+git clone https://github.com/forhadnmsu/JPsiGen
+cd JPsiGen
+
+# Add JLab software module path and make it
 module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
-# Load ROOT 6.30.02 module
 module load root/6.30.02-gcc11.4.0
 make
 setenv LD_LIBRARY_PATH $cwd/lib:$LD_LIBRARY_PATH
