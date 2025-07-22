@@ -1,7 +1,7 @@
 # JPsiGen
 A simple generator that generates exclusive J/psi photo production with it's e-e+ decay mode
 
-********************Info***********************
+*******************************************
 The generator will parse the GenOptions.dat and various parameters of the generator
 are set through this file.
 One also can use the python script `GenerateGenOptions.py` if you want to 
