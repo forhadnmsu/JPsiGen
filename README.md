@@ -28,3 +28,15 @@ An example command is
 * -lltarg 5             :   The target length is 5 cm, generated vertexes will be unifirmly distributed in the -2.5 to 2.5                               range
 * --Run                 :   Run the generator with specified options
 * --tSlope 1.13 -s 1.13 :   The tSlope
+
+
+# JPsiGen Build and Run Instructions
+
+```bash
+# Add JLab software module path
+module use /cvmfs/oasis.opensciencegrid.org/jlab/scicomp/sw/el9/modulefiles
+# Load ROOT 6.30.02 module
+module load root/6.30.02-gcc11.4.0
+make
+setenv LD_LIBRARY_PATH $cwd/lib:$LD_LIBRARY_PATH
+./JPsiGen.exe
